@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-pod
+  labels:
+    app: hello-world-deployment
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-world
+        image: jozefzatko/docker-hello-example:3.0.0
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+          - name: hello-world-config
+            mountPath: /etc/config
+          - name: hello-world-volume
+            mountPath: /folder
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 200m
+          limits:
+            memory: 500Mi
+            cpu: 500m
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          successThreshold: 1
+      volumes:
+        - name: hello-world-config
+          configMap:
+            name: hello-cm
+            items:
+            - key: application.properties 
+              path: application.properties
+        - name: hello-world-volume
+          persistentVolumeClaim:
+            claimName: 'hello-pvc'

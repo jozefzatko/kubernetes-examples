@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-cm
+data:
+  application.properties: |+
+    app.name=hello
+    folder.path=/folder
